@@ -1,6 +1,6 @@
 # compilers
 
-Primeira - Parte do Trabalho. 
+Primeira - Parte do Projeto. 
 
     1 - A Definição da Gramática Livre de Contexto (GLC).
     2 - A Identificação dos Tokens.
