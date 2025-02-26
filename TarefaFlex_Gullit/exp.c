@@ -1,107 +1,117 @@
 #include "lexer.h"
 #include "exp.h"
-/* Carrega uma string como entrada */
-YY_BUFFER_STATE buffer;
-int inicializa()
-{
-    char str[256];
-    printf("Arquivo: ");
-    scanf("%255s", str);
-    FILE *f = fopen(str, "r");
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-    if (f == NULL)
+/* Global buffer for input */
+YY_BUFFER_STATE buffer;
+
+/* Function to initialize the lexer with a file */
+int initialize_lexer()
+{
+    char filename[256];
+    printf("Enter the file name: ");
+    scanf("%255s", filename);
+
+    FILE *file = fopen(filename, "r");
+    if (file == NULL)
     {
-        perror("Erro ao abrir o arquivo");
-        return 0;
+        perror("Error opening file");
+        return 0; // Return 0 to indicate failure
     }
 
-    yyin = f;
-
-    return 1;
+    yyin = file; // Set the input file for the lexer
+    return 1;    // Return 1 to indicate success
 }
-Token *proximo_token()
+
+/* Function to get the next token from the lexer */
+Token *get_next_token()
 {
     return yylex();
 }
-void imprime_token(Token *tok)
+
+/* Function to print the token in the required format */
+void print_token(Token *token)
 {
-    /* Aqui deve implementar o código para mostrar o token retornado pelo
-    analisador léxico <token, atributo> de acordo com o tipo do token
-    (obs: lembre-se que alguns tokens não possuem atributo)*/
-    if (tok->tipo == TOK_INT)
+    if (token == NULL)
     {
-        printf("<Inteiro, %s >\n", tok->valor);
+        printf("<NULL_TOKEN>\n");
+        return;
     }
-    else if (tok->tipo == TOK_FLOAT)
+
+    switch (token->tipo)
     {
-        printf("<FLOAT, %s >\n", tok->valor);
-    }
-    else if (tok->tipo == TOK_SEP)
-    {
-        printf("<SEP, - >\n");
-    }
-    else if (tok->tipo == TOK_ID)
-    {
-        printf("<ID, %s >\n", tok->valor);
-    }
-    else if (tok->tipo == TOK_RELOP)
-    {
-        printf("<RELOP, %s >\n", tok->valor);
-    }
-    else if (tok->tipo == TOK_COMENT)
-    {
-        printf("<COMENT, - >\n");
-    }
-    else if (tok->tipo == TOK_ATRI)
-    {
-        printf("<ATR, - >\n");
-    }
-    else if (tok->tipo == TOK_EOF)
-    {
-        printf("<EOF, - >\n");
-    }
-    else if (tok->tipo == TOK_BEGIN)
-    {
-        printf("<BEGIN, - >\n");
-    }
-    else if (tok->tipo == TOK_END)
-    {
-        printf("<END, - >\n");
-    }
-    else if (tok->tipo == TOK_WHILE)
-    {
-        printf("<WHILE, - >\n");
-    }
-    else if (tok->tipo == TOK_REPEAT)
-    {
-        printf("<REPEAT, - >\n");
-    }
-    else if (tok->tipo == TOK_UNTIL)
-    {
-        printf("<UNTIL, - >\n");
-    }
-    else if (tok->tipo == TOK_OP)
-    {
-        printf("<OP, %s >\n", tok->valor);
-    }
-    else if (tok->tipo == TOK_PONT)
-    {
-        printf("<PONT, %s >\n", tok->valor);
+    case TOK_INT:
+        printf("<INT, %s>\n", token->valor);
+        break;
+    case TOK_FLOAT:
+        printf("<FLOAT, %s>\n", token->valor);
+        break;
+    case TOK_ID:
+        printf("<ID, %s>\n", token->valor);
+        break;
+    case TOK_RELOP:
+        printf("<RELOP, %s>\n", token->valor);
+        break;
+    case TOK_SEP:
+        printf("<SEP, ->\n");
+        break;
+    case TOK_COMENT:
+        printf("<COMENT, ->\n");
+        break;
+    case TOK_ATRI:
+        printf("<ATRI, ->\n");
+        break;
+    case TOK_EOF:
+        printf("<EOF, ->\n");
+        break;
+    case TOK_BEGIN:
+        printf("<BEGIN, ->\n");
+        break;
+    case TOK_END:
+        printf("<END, ->\n");
+        break;
+    case TOK_WHILE:
+        printf("<WHILE, ->\n");
+        break;
+    case TOK_REPEAT:
+        printf("<REPEAT, ->\n");
+        break;
+    case TOK_UNTIL:
+        printf("<UNTIL, ->\n");
+        break;
+    case TOK_OP:
+        printf("<OP, %s>\n", token->valor);
+        break;
+    case TOK_PONT:
+        printf("<PONT, %s>\n", token->valor);
+        break;
+    case TOK_ERROR:
+        printf("<ERROR, ->\n");
+        break;
+    default:
+        printf("<UNKNOWN_TOKEN, ->\n");
+        break;
     }
 }
+
 int main()
 {
-    if (inicializa())
+    if (!initialize_lexer())
     {
-        Token *tok;
-        while ((tok = proximo_token()) != NULL)
+        return 1; // Exit if file initialization fails
+    }
+
+    Token *token;
+    while ((token = get_next_token()) != NULL)
+    {
+        print_token(token);
+        if (token->tipo == TOK_EOF)
         {
-            imprime_token(tok);
-            if (tok->tipo == TOK_EOF)
-            {
-                break;
-            }
+            break; // Stop when EOF is reached
         }
     }
+
     return 0;
 }
